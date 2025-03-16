@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body, html {
+  margin: 0; /* Remove space at the top and bottom of the page */
+  padding: 0;
+}
+
+.comparison-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px; /* Keep space between sliders */
+  max-width: 1090px;
+  margin: 0 auto; /* Center horizontally */
+  padding: 0; /* Remove inner padding */
+}
+
+.comparison-slider {
+  position: relative;
+  width: 350px;
+  height: 350px;
+  overflow: hidden;
+  touch-action: none;
+  margin: 0; /* Remove space above and below each slider */
+  padding: 0; /* Ensure no inner padding */
+}
+
+.before-image,
+.after-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.after-image {
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+}
+
+.slider {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: white;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: col-resize;
+}
+
+.slider-button {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-button::before,
+.slider-button::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  background: #333;
+  left: 50%;
+  top: 50%;
+}
+
+.slider-button::before {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.slider-button::after {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.label {
+  position: absolute;
+  bottom: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+.before-label {
+  left: 10px;
+}
+
+.after-label {
+  right: 10px;
+}
+
+@media (max-width: 1090px) {
+  .comparison-container {
+    justify-content: center;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="comparison-container">
+  <div class="comparison-slider">
+    <img src="before-image-1.png">
+    <img src="after-image-1.png">
+    <div class="slider">
+      <div class="slider-button"></div>
+    </div>
+    <div class="label before-label">Before</div>
+    <div class="label after-label">After</div>
+  </div>
+  
+  <div class="comparison-slider">
+    <img src="before-image-2.png">
+    <img src="after-image-2.png">
+    <div class="slider">
+      <div class="slider-button"></div>
+    </div>
+    <div class="label before-label">Before</div>
+    <div class="label after-label">After</div>
+  </div>
+  
+  <div class="comparison-slider">
+    <img src="before-image-3.png">
+    <img src="after-image-3.png">
+    <div class="slider">
+      <div class="slider-button"></div>
+    </div>
+    <div class="label before-label">Before</div>
+    <div class="label after-label">After</div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.comparison-slider').forEach(slider => {
+  const sliderHandle = slider.querySelector('.slider');
+  const afterImage = slider.querySelector('.after-image');
+  let isMoving = false;
+  let startX = 0;
+  let startY = 0;
+
+  // Mouse events
+  sliderHandle.addEventListener('mousedown', startMoving);
+  document.addEventListener('mousemove', move);
+  document.addEventListener('mouseup', stopMoving);
+
+  // Touch events
+  sliderHandle.addEventListener('touchstart', startMoving);
+  document.addEventListener('touchmove', move);
+  document.addEventListener('touchend', stopMoving);
+
+  function startMoving(e) {
+    isMoving = true;
+    startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+    startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+    e.preventDefault(); // Prevent accidental page interactions
+  }
+
+  function stopMoving() {
+    isMoving = false;
+  }
+
+  function move(e) {
+    if (!isMoving) return;
+
+    const currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+    const currentY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+
+    // Check if the gesture is primarily horizontal
+    if (Math.abs(currentX - startX) > Math.abs(currentY - startY)) {
+      const sliderRect = slider.getBoundingClientRect();
+      const x = currentX - sliderRect.left;
+      const position = Math.max(0, Math.min((x / sliderRect.width) * 100, 100));
+
+      sliderHandle.style.left = `${position}%`;
+      afterImage.style.clipPath = `polygon(${position}% 0, 100% 0, 100% 100%, ${position}% 100%)`;
+      e.preventDefault(); // Prevent page scrolling for horizontal gestures
+    }
+  }
+});
+</script>
+</script>
+
+</body>
+</html>
